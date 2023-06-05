@@ -111,7 +111,7 @@
                   >Description</label
                 >
                 <textarea
-                v-model="description"
+                  v-model="description"
                   id="description"
                   rows="15"
                   class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -149,6 +149,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { initFlowbite } from "flowbite";
+import { toast } from "vue3-toastify";
 const products = ref([]);
 const router = useRoute();
 const Router = useRouter();
@@ -158,6 +159,7 @@ let price = ref(null);
 let description = ref("");
 let category = ref("");
 const productId = ref(null);
+let errorMessage = ref("");
 
 onMounted(() => {
   initFlowbite();
@@ -188,20 +190,31 @@ function update() {
     description.value,
     category.value
   );
-  if (products.value.length) {
-    products.value.forEach((pr) => {
-      if (pr.id === +productId.value) {
-        pr.name = name.value;
-        pr.brand = brand.value;
-        pr.price = price.value;
-        pr.description = description.value;
-        pr.category = category.value;
-      }
-    });
+  if (
+    !name.value ||
+    !brand.value ||
+    !price.value ||
+    !description.value ||
+    !category.value
+  ) {
+    toast.error("Please Enter the information");
+  } else {
+    if (products.value.length) {
+      products.value.forEach((pr) => {
+        if (pr.id === +productId.value) {
+          pr.name = name.value;
+          pr.brand = brand.value;
+          pr.price = price.value;
+          pr.description = description.value;
+          pr.category = category.value;
+        }
+      });
+    }
+    reset();
+    localStorage.setItem("products", JSON.stringify(products.value));
+    toast.success("Product successfully updated");
+    Router.push("/");
   }
-  reset();
-  localStorage.setItem("products", JSON.stringify(products.value));
-  Router.push("/");
 }
 
 function reset() {

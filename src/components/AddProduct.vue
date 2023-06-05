@@ -141,8 +141,9 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-let router = useRouter();
+import { toast } from "vue3-toastify";
 
+let router = useRouter();
 let name = ref("");
 let brand = ref("");
 let price = ref(null);
@@ -173,11 +174,13 @@ function addProduct() {
     !category.value
   ) {
     errorMessage.value = "error ";
+    toast.warning("Fill in the information");
   } else {
     errorMessage.value = "";
     let products = JSON.parse(localStorage.getItem("products")) || [];
     products.push(options);
     localStorage.setItem("products", JSON.stringify(products));
+    toast.success("Product successfully added");
     router.push("/");
   }
 }
